@@ -1,0 +1,1340 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>AgriMatrix</title>
+  <link rel="icon" type="image/png" href="assets/leaf.png" />
+  <style>
+    :root {
+      --bg: #000;
+      --g1: #7ed957;
+      --g2: #7acb53;
+      --muted: rgba(255, 255, 255, 0.92);
+      --muted-2: rgba(255, 255, 255, 0.75);
+      --card-bg: rgba(255, 255, 255, 0.03);
+      --glass: rgba(255, 255, 255, 0.035);
+      --container: 1100px;
+      --radius: 14px;
+    }
+
+    * {
+      box-sizing: border-box
+    }
+
+    html,
+    body {
+      height: 100%
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      background: var(--bg);
+      color: var(--muted);
+      font-family: Inter, system-ui, -apple-system, 'Segoe UI', Roboto, Arial;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+      display: flex;
+      justify-content: center;
+      align-items: flex-start;
+      padding: 48px 20px;
+    }
+
+    .site {
+      width: 100%;
+      max-width: var(--container);
+      margin: 0 auto;
+    }
+
+    /* --- TOP ANIMATION (inserted) --- */
+    .top-anim {
+      width: 100%;
+      display: flex;
+      justify-content: center;
+      margin-bottom: 18px;
+      pointer-events: none;
+      /* decorative only */
+    }
+
+    .top-anim .anim-wrap {
+      width: 140px;
+      height: 140px;
+      position: relative;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    /* glowing leaf container */
+    .glowing-leaf-container {
+      width: 112px;
+      height: 112px;
+      border-radius: 20px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: linear-gradient(135deg, rgba(126, 217, 87, 0.06), rgba(122, 203, 83, 0.04));
+      position: relative;
+      z-index: 40;
+      overflow: visible;
+      transform-origin: center;
+      animation: pulseGlow 2.2s ease-in-out infinite;
+    }
+
+    .glowing-leaf-container img {
+      width: 78px;
+      height: 78px;
+      object-fit: contain;
+      display: block;
+      filter: drop-shadow(0 6px 18px rgba(0, 0, 0, 0.6));
+    }
+
+    @keyframes pulseGlow {
+      0% {
+        filter: drop-shadow(0 0 6px rgba(126, 217, 87, 0.25));
+        transform: translateY(0) scale(1);
+      }
+
+      50% {
+        filter: drop-shadow(0 0 20px rgba(126, 217, 87, 0.45));
+        transform: translateY(-4px) scale(1.03);
+      }
+
+      100% {
+        filter: drop-shadow(0 0 6px rgba(126, 217, 87, 0.25));
+        transform: translateY(0) scale(1);
+      }
+    }
+
+    /* cubes area sits behind the leaf, spawning falling cubes */
+    .cubes-area {
+      position: absolute;
+      inset: -6px -80px auto -80px;
+      width: 420px;
+      height: 220px;
+      margin-left: 70px;
+      margin-top: 190px;
+      pointer-events: none;
+      z-index: 20;
+      display: block;
+    }
+
+    .cube {
+      position: absolute;
+      width: 10px;
+      height: 10px;
+      border-radius: 3px;
+      background: linear-gradient(90deg, var(--g1), var(--g2));
+      opacity: 0.95;
+      transform-origin: center;
+      will-change: transform, opacity, left, top;
+      box-shadow: 0 6px 16px rgba(0, 0, 0, 0.45);
+    }
+
+    /* animation keyframes for the cubes - they fall and drift and fade */
+    @keyframes cubeFall {
+      0% {
+        transform: translateY(-30px) scale(1) rotate(0deg);
+        opacity: 1;
+      }
+
+      60% {
+        transform: translateY(120px) scale(0.9) rotate(18deg);
+        opacity: 0.95;
+      }
+
+      100% {
+        transform: translateY(260px) scale(0.7) rotate(36deg);
+        opacity: 0;
+      }
+    }
+
+    /* --- END TOP ANIMATION --- */
+
+    header {
+      text-align: center;
+      margin-top: -50px;
+      margin-bottom: 28px;
+    }
+
+    .logo {
+      width: 96px;
+      height: 96px;
+      border-radius: 18px;
+      margin: 0 auto 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: linear-gradient(135deg, var(--g1), var(--g2));
+      color: #001;
+      font-weight: 900;
+      font-size: 28px;
+      box-shadow: 0 14px 44px rgba(0, 0, 0, 0.6);
+    }
+
+    h1 {
+      margin: 0;
+      color: #fff;
+      font-size: 34px
+    }
+
+    .lead {
+      margin: 6px 0 0;
+      color: var(--muted-2);
+      font-size: 15px
+    }
+
+    main {
+      display: flex;
+      flex-direction: column;
+      gap: 28px;
+    }
+
+    section {
+      background: var(--card-bg);
+      border-radius: var(--radius);
+      padding: 28px;
+      position: relative;
+      overflow: visible;
+      box-shadow: 0 8px 34px rgba(0, 0, 0, 0.65);
+      border: 1px solid rgba(255, 255, 255, 0.02);
+    }
+
+    .section-inner {
+      max-width: 980px;
+      margin: 0 auto;
+      position: relative;
+      z-index: 2;
+    }
+
+    h2 {
+      color: var(--g1);
+      margin: 0 0 10px;
+      font-size: 22px;
+    }
+
+    h3 {
+      color: var(--g2);
+      margin: 6px 0;
+      font-size: 16px;
+    }
+
+    p,
+    li {
+      color: var(--muted);
+      line-height: 1.55;
+      font-size: 15px;
+    }
+
+    ul {
+      padding-left: 18px;
+      display: inline-block;
+      text-align: left;
+      margin-top: 10px;
+    }
+
+    /* Two-column row for left/right sections */
+    .row {
+      display: grid;
+      grid-template-columns: 1fr 420px;
+      gap: 22px;
+      align-items: center;
+    }
+
+    .row.reverse {
+      grid-template-columns: 420px 1fr;
+    }
+
+    /* used to place image on left, text on right */
+
+    /* Image-themed boxes (pure CSS agricultural illustrations) */
+    .agri-img {
+      width: 100%;
+      height: 260px;
+      border-radius: 12px;
+      position: relative;
+      overflow: hidden;
+      border: 1px solid rgba(255, 255, 255, 0.03);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: inset 0 -20px 40px rgba(0, 0, 0, 0.25);
+      background-color: #071204;
+    }
+
+    /* 3 different image themes: fields, greenhouse, aerial patchwork */
+    /* Overview theme — wide striped fields + sun (used when img-class="fields") */
+    .agri-img.fields {
+      background:
+        radial-gradient(circle at 80% 16%, rgba(255, 210, 120, 0.08), transparent 8%),
+        linear-gradient(180deg, rgba(10, 20, 8, 0.55), rgba(7, 12, 4, 0.85));
+    }
+
+    .agri-img.fields::before {
+      content: '';
+      position: absolute;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      height: 60%;
+      background:
+        repeating-linear-gradient(90deg, rgba(126, 217, 87, 0.18) 0 22px, rgba(122, 203, 83, 0.12) 22px 44px),
+        linear-gradient(180deg, rgba(126, 217, 87, 0.02), rgba(122, 203, 83, 0.01));
+      transform: skewY(-7deg);
+      transform-origin: left bottom;
+      opacity: 0.98;
+    }
+
+    .agri-img.fields .glyph {
+      position: relative;
+      z-index: 2;
+      font-size: 42px;
+      transform: translateY(-8px);
+      color: rgba(255, 255, 255, 0.9);
+      text-shadow: 0 6px 18px rgba(0, 0, 0, 0.7);
+    }
+
+    .agri-img.fields .caption {
+      position: absolute;
+      left: 14px;
+      bottom: 12px;
+      font-size: 13px;
+      color: rgba(255, 255, 255, 0.8);
+      background: rgba(0, 0, 0, 0.22);
+      padding: 6px 10px;
+      border-radius: 8px;
+    }
+
+    /* LitRev theme — greenhouse glass panes + soft plants (used when img-class="greenhouse") */
+    .agri-img.greenhouse {
+      background:
+        linear-gradient(180deg, rgba(6, 20, 6, 0.6), rgba(2, 6, 2, 0.9));
+    }
+
+    .agri-img.greenhouse::before {
+      content: '';
+      position: absolute;
+      inset: 10px;
+      background:
+        linear-gradient(135deg, rgba(255, 255, 255, 0.03), rgba(255, 255, 255, 0.01));
+      mix-blend-mode: overlay;
+      border-radius: 8px;
+      box-shadow: inset 0 0 40px rgba(0, 0, 0, 0.6);
+    }
+
+    .agri-img.greenhouse::after {
+      content: '';
+      position: absolute;
+      left: 12px;
+      right: 12px;
+      bottom: 12px;
+      height: 36%;
+      background:
+        radial-gradient(circle at 40% 10%, rgba(126, 217, 87, 0.12), transparent 10%),
+        linear-gradient(90deg, rgba(126, 217, 87, 0.08), rgba(122, 203, 83, 0.06));
+      border-radius: 8px;
+      transform: skewX(-6deg);
+      opacity: 0.98;
+    }
+
+    .agri-img.greenhouse .glyph {
+      position: relative;
+      z-index: 2;
+      font-size: 40px;
+      color: rgba(255, 255, 255, 0.92)
+    }
+
+    .agri-img.greenhouse .caption {
+      position: absolute;
+      right: 12px;
+      top: 12px;
+      font-size: 13px;
+      color: rgba(255, 255, 255, 0.85);
+      background: rgba(0, 0, 0, 0.22);
+      padding: 6px 10px;
+      border-radius: 8px;
+    }
+
+    /* Method theme — aerial patchwork / mosaic fields (used when img-class="patchwork") */
+    .agri-img.patchwork {
+      background:
+        linear-gradient(180deg, rgba(8, 18, 6, 0.6), rgba(3, 6, 2, 0.9));
+    }
+
+    .agri-img.patchwork::before {
+      content: '';
+      position: absolute;
+      left: 10px;
+      right: 10px;
+      top: 12px;
+      bottom: 12px;
+      border-radius: 10px;
+      background:
+        linear-gradient(90deg, rgba(126, 217, 87, 0.06) 0 25%, rgba(122, 203, 83, 0.04) 25% 50%, rgba(126, 217, 87, 0.05) 50% 75%, rgba(122, 203, 83, 0.03) 75% 100%),
+        repeating-linear-gradient(0deg, rgba(0, 0, 0, 0.02) 0 12px, transparent 12px 24px);
+      box-shadow: inset 0 20px 40px rgba(0, 0, 0, 0.5);
+      transform: rotate(-3deg);
+      opacity: 0.95;
+    }
+
+    .agri-img.patchwork .glyph {
+      position: relative;
+      z-index: 2;
+      font-size: 42px;
+      color: rgba(255, 255, 255, 0.9)
+    }
+
+    .agri-img.patchwork .caption {
+      position: absolute;
+      left: 14px;
+      top: 12px;
+      font-size: 13px;
+      color: rgba(255, 255, 255, 0.85);
+      background: rgba(0, 0, 0, 0.22);
+      padding: 6px 10px;
+      border-radius: 8px;
+    }
+
+    .white-text {
+      color: white;
+      font-size: 75px;
+      font-weight: 900;
+
+    }
+
+    .green-text {
+      color: #7ed957;
+      font-size: 75px;
+      font-weight: 900;
+    }
+
+    /* Small decorative glyphs inside image boxes */
+    .glyph {
+      font-size: 40px;
+      filter: drop-shadow(0 6px 16px rgba(0, 0, 0, 0.7));
+    }
+
+    /* Keep text columns nicely padded */
+    .text-col {
+      padding: 6px 6px;
+      text-align: left;
+    }
+
+    /* On narrower screens switch to single column stacks */
+    @media (max-width:980px) {
+
+      .row,
+      .row.reverse {
+        grid-template-columns: 1fr;
+      }
+
+      .agri-img {
+        height: 220px;
+      }
+
+      .top-anim {
+        margin-bottom: 12px;
+      }
+    }
+
+    /* Keep site horizontally centered with equal margins */
+    @media (min-width:1200px) {
+      body {
+        padding-left: calc((100vw - var(--container))/2 + 48px);
+        padding-right: calc((100vw - var(--container))/2 + 48px);
+      }
+    }
+
+    /* small utilities */
+    .muted {
+      color: var(--muted-2);
+      font-size: 14px
+    }
+  </style>
+</head>
+
+<body>
+  <div class="site">
+
+    <div class="top-anim" aria-hidden="true">
+      <div class="anim-wrap">
+        <img src="assets/leaf.png" alt="AgriMatrix Leaf Logo"
+          style="width: 150px;height: 150px;margin-right: 220px;margin-top: 20px" />
+        <div class="cubes-area" id="cubesArea"></div>
+      </div>
+    </div>
+
+    <header>
+      <span class="white-text">Agri</span><span class="green-text">Matrix</span>
+    </header>
+
+    <main>
+
+      <!-- OVERVIEW (LEFT) -->
+      <section aria-labelledby="overview">
+        <div class="section-inner">
+          <div class="row">
+            <!-- text on the left -->
+            <div class="text-col">
+              <h2 id="overview">What is AgriMatrix?</h2>
+              <p style="margin-top:12px;">Sri Lanka’s agriculture is a cornerstone of its economy, sustaining millions
+                of livelihoods across the island. Yet, challenges like unpredictable weather, land-use changes, and
+                inefficient monitoring make it difficult to manage farmlands effectively. Traditional methods of
+                tracking crop growth and land conditions are slow and often inaccurate — especially across large or
+                remote areas.<br><br>
+
+                Our project uses remote sensing and deep learning to transform how agricultural lands are detected and
+                monitored in Sri Lanka. By analyzing satellite imagery from sources such as Sentinel-2 and Landsat, we
+                can automatically identify cultivated areas, track vegetation health, and detect land-use changes with
+                remarkable precision.<br><br>
+
+                Through deep learning models like Convolutional Neural Networks (CNNs), the system learns to recognize
+                different crop patterns, soil textures, and vegetation indices — turning complex image data into
+                meaningful insights. This technology enables continuous, island-wide monitoring of farmlands, providing
+                valuable information for farmers, researchers, and policymakers to make informed decisions that boost
+                productivity and promote sustainable agriculture.</p>
+            </div>
+
+
+
+            <div>
+              <img src="assets/leaf.png" alt="Cultivated fields" style="width:100%;border-radius:12px;opacity: 0.2;" />
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- LITERATURE REVIEW (RIGHT) -->
+      <section aria-labelledby="litrev">
+        <div class="section-inner">
+          <div class="row reverse">
+
+            <div>
+              <img src="assets/tree_logo.png" alt="Cultivated fields"
+                style="width:100%;border-radius:12px;opacity: 0.8;height: 800px;" />
+            </div>
+
+            <!-- text on the right -->
+            <div style="border: 1px solid #7ed957; border-radius: 20px; padding: 10px 10px;">
+              <div class="text-col">
+                <h2 id="litrev" style="color: white;">Literature Review</h2>
+                <p style="color: #7ed957; font-weight: 600;">Detecting and Monitoring Varieties of Crops in Cultivated
+                  Lands</p>
+                <p>Remote sensing technology combined with machine learning algorithms enables scientists to detect and
+                  track different crop types throughout extensive agricultural areas. The research conducted by Lu et
+                  al. (2023) demonstrated that time-series satellite imagery combined with deep learning architectures
+                  can accurately distinguish crop types and growth stages, even under varying environmental conditions.
+                  The research conducted by Chandrasiri et al. (The authors (2023) used Sentinel-2 and Landsat data to
+                  generate rice field maps throughout Sri Lanka which demonstrated that multispectral imagery works well
+                  for large-scale crop monitoring operations. The methods enable precision agriculture because they
+                  allow farmers to track crop health and distribution patterns at particular times.
+                </p><br>
+                <p style="color: #7ed957; font-weight: 600;">Detection and Classification of Agricultural Lands</p>
+                <p>Deep learning-based classification systems serve as primary tools for agricultural land use
+                  identification which includes paddy and tea and coconut plantations. Turkoglu (2021) demonstrated that
+                  Sentinel-2 data can be processed through convolutional neural networks to detect agricultural land
+                  parcels and estimate their production output. Real-time agricultural area classification becomes
+                  possible through automated systems which use these networks to perform spatial productivity analysis
+                  between different regions. The methods allow for real-time crop-type detection and land monitoring
+                  which helps policymakers and managers make better decisions.
+                </p><br>
+                <p style="color: #7ed957; font-weight: 600;">Aerial Land Measurement and Vegetation Health Analysis</p>
+                <p>Combining aerial remote sensing, geospatial modeling, and machine learning has proven highly
+                  effective for evaluating vegetation health and measuring cultivated areas. Gholizadeh et al. (The
+                  authors of (2025) studied precision agriculture systems to find that NDVI and EVI vegetation indices
+                  successfully identify crop stress and canopy health issues before they become severe. Complementary
+                  research by Herath et al. (The research by (2024) showed how UAV-based imagery works for paddy field
+                  monitoring and weed detection in Sri Lanka through the combination of aerial data with ground-based
+                  verification. The implemented methods enhance both land measurement accuracy throughout various
+                  regions and vegetation data analysis capabilities.
+                </p><br>
+                <p style="color: #7ed957; font-weight: 600;">Crop Yield Prediction and Alert System</p>
+                <p>The fusion of remote sensing indices with climatic parameters and advanced machine learning models
+                  has greatly improved yield prediction accuracy. Dissanayake et al. (The authors in (2023) showed that
+                  Support Vector Machines and Artificial Neural Networks and LSTMs produce superior results than
+                  statistical approaches for crop yield prediction. Ekanayake et al. (The authors in (2022) used
+                  Gaussian Process Regression to forecast Sri Lankan paddy yields based on rainfall and temperature data
+                  which produced excellent results. The models generate precise yield predictions which enable warning
+                  systems to detect both abandoned and vulnerable agricultural areas.
+                </p><br>
+
+                <a href="https://docs.google.com/document/d/1MLSz5nfPnlpBPv0RmJuSFu134HvPYJNX_oEsS-6iqPM/edit?usp=sharing"
+                  style="border: 1px solid #7ed957;border-radius: 20px;width: 150px;font-size: 12px;padding: 6px 8px;text-decoration: none;color:#7acb53;">Reference
+                  Summary</a>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section aria-labelledby="overview">
+        <div class="section-inner">
+          <div class="row">
+            <!-- text on the left -->
+            <div class="text-col">
+              <h2 id="overview">Reserach Gap</h2>
+              <p style="margin-top:12px;">
+                Efficiently managing Sri Lanka’s agricultural lands is challenged by manual, time-consuming methods.
+                There is a need for an automated system to detect and classify crop varieties, provide aerial land
+                measurements and vegetation health analysis, and issue alerts for uncultivated lands or crop changes.
+                Integrating satellite imagery and deep learning can enable real-time monitoring, support precision
+                agriculture, and optimize crop management.
+              </p>
+            </div>
+
+
+            <div>
+
+              <img src="assets/leaf_diamond.png" alt="Cultivated fields" style="width:100%;border-radius:12px;" />
+
+            </div>
+          </div>
+        </div>
+      </section>
+
+
+
+      <!-- RESERACH PROBLEMS(RIGHT) -->
+      <section aria-labelledby="litrev">
+        <div class="section-inner">
+          <div class="row reverse">
+
+            <div>
+              <img src="assets/climber.png" alt="Cultivated fields"
+                style="width:100%;border-radius:12px;opacity: 0.6;height: 820px;" />
+            </div>
+
+            <!-- text on the right -->
+            <div class="text-col">
+              <h2 id="litrev">Reserach Problems</h2>
+              <br>
+              <div style="border: 1px solid #7ed957; border-radius: 20px;padding: 0 10px;">
+                <p class="muted" style="font-weight: 600; color: #7acb53;">Challenges in Multi-Class Crop Classification
+                </p>
+                <p>How can crop varieties such as Tea, Rubber, Paddy, Coconut, and Palm in Sri Lanka’s cultivated lands
+                  be accurately detected and monitored using satellite imagery and deep learning techniques, while
+                  overcoming challenges of environmental variability, crop similarities, and data limitations?
+                </p>
+              </div>
+              <br>
+              <div style="border: 1px solid #7ed957; border-radius: 20px;padding: 0 10px;">
+                <p class="muted" style="font-weight: 600; color: #7acb53;">Automated Crop Productivity Classification
+                  Impact</p>
+                <p>How can Sri Lanka overcome the absence of an automated, satellite-based system that provides
+                  real-time, spatially explicit crop productivity data for paddy, tea, and coconut, instead of relying
+                  on manual, error-prone data collection methods that hinder timely decision-making and effective
+                  agricultural management?
+                </p>
+              </div>
+              <br>
+              <div style="border: 1px solid #7ed957; border-radius: 20px;padding: 0 10px;">
+                <p class="muted" style="font-weight: 600; color: #7acb53;">Challenges in Monitoring Crop Health</p>
+                <p>Farmers in Sri Lanka face significant challenges in accurately measuring cropland and monitoring crop
+                  health. Traditional land measurement methods are slow, labor-intensive, and often struggle to account
+                  for slopes, resulting in inaccurate area estimations. At the same time, vegetation monitoring is
+                  mostly reactive, relying on current NDVI snapshots rather than predictive forecasting, and there is a
+                  lack of farmer-friendly visualization tools.
+                </p>
+              </div>
+              <br>
+              <div style="border: 1px solid #7ed957; border-radius: 20px;padding: 0 10px;">
+                <p class="muted" style="font-weight: 600; color: #7acb53;">Lacking an Automated Crop Yield Prediction
+                  System</p>
+                <p>Sri Lanka lacks an automated, reliable crop yield prediction and uncultivated land monitoring system.
+                  Current practices rely on manual surveys, which are slow, error-prone, and provide limited
+                  spatial/temporal coverage </p>
+              </div>
+              <br>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- RESERACH OBJECTIVES (LEFT) -->
+      <section aria-labelledby="method">
+        <div class="section-inner">
+          <div class="row">
+            <!-- text on the left -->
+            <div class="text-col">
+              <h2 id="method" style="color: white;">Reserach Objectives</h2>
+              <br>
+              <h3>Detecting and Monitoring Varieties of Crops in Cultivated Lands</h3>
+              <p>Detecting and monitoring varieties of crop in cultivated lands using satellite imagery and
+                classification techniques involves a combination of remote sensing, data analysis, and ML.
+              </p><br>
+              <h3>Detection and Classification of Agricultural Lands</h3>
+              <p>Develop an automated satellite-based system to monitor and classify paddy, tea, and coconut plantations
+                in Sri Lanka into high, medium, and low productivity levels using deep learning and real-time web
+                visualization.
+              </p><br>
+              <h3>Aerial Land Measurement and Vegetation Health Analysis</h3>
+              <p>Design and implement an integrated system for predictive vegetation health analysis, province-wise
+                cropland mapping and area calculation, and province-wise land cover classification and area calculation,
+                by combining remote sensing data, geospatial analysis, and advanced machine learning models.
+              </p><br>
+              <h3>Crop Yield Prediction and Alert System</h3>
+              <p>To develop crop yield prediction and alert system for Sri Lanka that predicts seasonal crop yields at
+                district level (Mainly for paddy), integrates remote sensing indices (NDVI, soil moisture) with climate
+                factors (rainfall,
+                temperature), provides an early warning alert mechanism for uncultivated lands and crop changes, and
+                delivers outputs through a user-friendly web-based dashboard.
+
+              </p>
+            </div>
+
+            <div>
+              <img src="assets/climber_2.png" alt="Cultivated fields"
+                style="width:100%;border-radius:12px;opacity: 0.8;height: 850px;" />
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- METHODOLOGY(RIGHT) -->
+      <section aria-labelledby="litrev">
+        <div class="section-inner">
+          <div class="row reverse">
+
+            <div>
+              <img src="assets/climber_3.png" alt="Cultivated fields"
+                style="width:100%;border-radius:12px;opacity: 0.5;height: 1200px;" />
+            </div>
+
+            <!-- text on the right -->
+            <div style="border: 1px solid #7ed957; border-radius: 20px; padding: 10px 10px;">
+              <div class="text-col">
+                <h2 id="litrev" style="color: #7ed957;">Methodology</h2>
+                <p>The AgriMatrix system integrates remote sensing, geospatial analytics, and deep learning to enable
+                  large-scale detection, monitoring, and productivity assessment of agricultural lands across Sri Lanka.
+                  The workflow combines data collection, preprocessing, model development, system integration, and
+                  visualization.</p><br>
+                <p style="color: #7ed957; font-weight: 600;">1. Data Acquisition and Preprocessing</p>
+                <p>The collection includes satellite data from Sentinel-2 and Landsat-8 and UAV information for various
+                  agricultural districts. The Python libraries NumPy and Pandas provide efficient array and tabular
+                  operations which support cloud masking and atmospheric correction tasks in the cloud. The analysis
+                  uses NDVI and EVI and NDWI vegetation indices to obtain spectral data which shows vegetation health
+                  and soil moisture levels.
+                  The SMOTE technique serves to balance datasets with uneven crop distributions because it enables
+                  models to achieve improved generalization performance.
+                </p><br>
+                <p style="color: #7ed957; font-weight: 600;">2. Feature Engineering and Model Development</p>
+                <p>The backend system uses FastAPI and Flask to create a modular structure which enables scalable
+                  deployment and API-based data exchange. The system uses FastAPI to handle model inference requests and
+                  image uploads and data queries but Flask serves as the dashboard visualization platform which delivers
+                  processed analytics to the frontend.
+                  The system stores data in MongoDB because this database management system efficiently manages
+                  geospatial JSON structures and time-series crop metrics.</p><br>
+                <p style="color: #7ed957; font-weight: 600;">3. System Architecture and Backend Integration</p>
+                <p>Combining aerial remote sensing, geospatial modeling, and machine learning has proven highly
+                  effective for evaluating vegetation health and measuring cultivated areas. Gholizadeh et al. (The
+                  authors of (2025) studied precision agriculture systems to find that NDVI and EVI vegetation indices
+                  successfully identify crop stress and canopy health issues before they become severe. Complementary
+                  research by Herath et al. (The research by (2024) showed how UAV-based imagery works for paddy field
+                  monitoring and weed detection in Sri Lanka through the combination of aerial data with ground-based
+                  verification. The implemented methods enhance both land measurement accuracy throughout various
+                  regions and vegetation data analysis capabilities.
+                </p><br>
+                <p style="color: #7ed957; font-weight: 600;">4. Visualization and User Interface</p>
+                <p>The web-based visualization layer uses React and CSS to create an interactive platform which enables
+                  users to view classified land parcels and health maps and yield predictions. The system updates
+                  vegetation indices and alerts and analytics in real time through its dynamic data rendering
+                  functionality. The dashboard shows project milestones through its vertical timeline design which
+                  allows users to monitor progress through analytics.
+                  The system enables decision-making for agricultural authorities through its ability to integrate
+                  mapping APIs which allows users to overlay classified layers with district boundaries and yield
+                  forecasts.
+                </p><br>
+                <p style="color: #7ed957; font-weight: 600;">5. System Output and Evaluation</p>
+                <p>The system delivers three core outputs:<br>
+                <ul>
+                  <li>Land classification maps showing cultivated crops and productivity zones.</li>
+                  <li>Vegetation health analytics with province-wise summaries.</li>
+                  <li>Yield prediction and alert notifications highlighting low-yield or uncultivated areas.</li>
+                </ul>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Keep the rest of the site (tools, milestones, docs, team, contact) unchanged below -->
+      <!-- TOOLS -->
+      <section class="tools" aria-labelledby="tools">
+        <div class="section-inner">
+          <h2 id="tools">Technologies & Tools</h2>
+          <br>
+          <div style="margin-top:12px; display:flex; gap:18px; justify-content:center; flex-wrap:wrap;">
+            <div
+              style="width:300px; background:var(--glass); border-radius:12px; padding:18px; text-align:center; border:1px solid rgba(255,255,255,0.02);">
+              <div style="color:var(--g2); font-weight:700; margin-bottom:8px;">Frontend</div>
+              <div style="display:flex;gap:12px;justify-content:center;">
+                <div
+                  style="width:80px;height:80px;border-radius:12px;background:linear-gradient(180deg,rgba(126,217,87,0.06),rgba(122,203,83,0.02));display:flex;flex-direction:column;align-items:center;justify-content:center;font-size:28px">
+                  <div>⚛️</div>
+                  <div style="font-size:12px;margin-top:6px;color:var(--muted-2)">React</div>
+                </div>
+                <div
+                  style="width:80px;height:80px;border-radius:12px;background:linear-gradient(180deg,rgba(126,217,87,0.06),rgba(122,203,83,0.02));display:flex;flex-direction:column;align-items:center;justify-content:center;font-size:28px">
+                  <div>🎨</div>
+                  <div style="font-size:12px;margin-top:6px;color:var(--muted-2)">CSS</div>
+                </div>
+              </div>
+            </div>
+
+            <div
+              style="width:300px; background:var(--glass); border-radius:12px; padding:18px; text-align:center; border:1px solid rgba(255,255,255,0.02);">
+              <div style="color:var(--g2); font-weight:700; margin-bottom:8px;">Backend</div>
+              <div style="display:flex;gap:12px;justify-content:center;">
+                <div
+                  style="width:80px;height:80px;border-radius:12px;background:linear-gradient(180deg,rgba(126,217,87,0.06),rgba(122,203,83,0.02));display:flex;flex-direction:column;align-items:center;justify-content:center;font-size:28px">
+                  <div>🚀</div>
+                  <div style="font-size:12px;margin-top:6px;color:var(--muted-2)">FastAPI</div>
+                </div>
+                <div
+                  style="width:80px;height:80px;border-radius:12px;background:linear-gradient(180deg,rgba(126,217,87,0.06),rgba(122,203,83,0.02));display:flex;flex-direction:column;align-items:center;justify-content:center;font-size:28px">
+                  <div>🔥</div>
+                  <div style="font-size:12px;margin-top:6px;color:var(--muted-2)">Flask</div>
+                </div>
+                <div
+                  style="width:80px;height:80px;border-radius:12px;background:linear-gradient(180deg,rgba(126,217,87,0.06),rgba(122,203,83,0.02));display:flex;flex-direction:column;align-items:center;justify-content:center;font-size:28px">
+                  <div>🐍</div>
+                  <div style="font-size:12px;margin-top:6px;color:var(--muted-2)">Python</div>
+                </div>
+              </div>
+            </div>
+
+            <div
+              style="width:300px; background:var(--glass); border-radius:12px; padding:18px; text-align:center; border:1px solid rgba(255,255,255,0.02);">
+              <div style="color:var(--g2); font-weight:700; margin-bottom:8px;">Storage & Data</div>
+              <div style="display:flex;gap:12px;justify-content:center;flex-wrap:wrap;">
+                <div
+                  style="width:80px;height:80px;border-radius:12px;background:linear-gradient(180deg,rgba(126,217,87,0.06),rgba(122,203,83,0.02));display:flex;flex-direction:column;align-items:center;justify-content:center;font-size:28px">
+                  <div>🗄️</div>
+                  <div style="font-size:12px;margin-top:6px;color:var(--muted-2)">MongoDB</div>
+                </div>
+                <div
+                  style="width:80px;height:80px;border-radius:12px;background:linear-gradient(180deg,rgba(126,217,87,0.06),rgba(122,203,83,0.02));display:flex;flex-direction:column;align-items:center;justify-content:center;font-size:28px">
+                  <div>∑</div>
+                  <div style="font-size:12px;margin-top:6px;color:var(--muted-2)">NumPy</div>
+                </div>
+                <div
+                  style="width:80px;height:80px;border-radius:12px;background:linear-gradient(180deg,rgba(126,217,87,0.06),rgba(122,203,83,0.02));display:flex;flex-direction:column;align-items:center;justify-content:center;font-size:28px">
+                  <div>📊</div>
+                  <div style="font-size:12px;margin-top:6px;color:var(--muted-2)">Pandas</div>
+                </div>
+                <div
+                  style="width:80px;height:80px;border-radius:12px;background:linear-gradient(180deg,rgba(126,217,87,0.06),rgba(122,203,83,0.02));display:flex;flex-direction:column;align-items:center;justify-content:center;font-size:28px">
+                  <div>🧠</div>
+                  <div style="font-size:12px;margin-top:6px;color:var(--muted-2)">Scikit-Learn</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- MILestones (kept attractive from earlier) -->
+      <section aria-labelledby="milestones">
+        <div class="section-inner">
+          <h2 id="milestones">Project Milestones</h2>
+
+          <div style="position:relative; padding:18px 0;">
+            <div
+              style="position:absolute; left:50%; transform:translateX(-50%); top:20px; bottom:20px; width:6px; background:linear-gradient(180deg,var(--g1),var(--g2)); border-radius:6px; box-shadow:0 6px 16px rgba(0,0,0,0.6)">
+            </div>
+
+            <div style="display:flex; flex-direction:column; gap:20px;">
+
+              <!-- item 1 (left) -->
+              <div style="display:grid; grid-template-columns:1fr 28px 1fr; gap:18px; align-items:center;">
+                <div
+                  style="justify-self:end; text-align:right; width:92%; max-width:520px; background:linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.008)); padding:14px; border-radius:18px; border:1px solid rgba(255,255,255,0.02); box-shadow:0 8px 30px rgba(0,0,0,0.6)">
+                  <div style="font-size:13px;color:var(--muted-2)">2025-01-27</div>
+                  <div style="font-weight:800;color:#7ed957;margin-top:6px">Project Proposal</div>
+                  <div style="margin-top:6px;color:white;">A Project Proposal is presented to potential sponsors or
+                    clients to receive funding or get the project approved.</div>
+                </div>
+                <div style="text-align:center;">
+                  <div
+                    style="width:22px;height:22px;border-radius:50%; background:var(--bg); box-shadow:0 0 0 6px rgba(126,217,87,0.12); display:inline-flex; align-items:center; justify-content:center; color:var(--g1); font-weight:800">
+                    •</div>
+                </div>
+                <div></div>
+              </div>
+
+              <!-- item 2 (right) -->
+              <div style="display:grid; grid-template-columns:1fr 28px 1fr; gap:18px; align-items:center;">
+                <div></div>
+                <div style="text-align:center;">
+                  <div
+                    style="display:inline-block; width:36px; height:12px; border-radius:8px; background:linear-gradient(90deg,var(--g1),var(--g2)); box-shadow:0 8px 20px rgba(0,0,0,0.6), 0 0 0 4px rgba(126,217,87,0.06);">
+                  </div>
+                </div>
+                <div
+                  style="justify-self:start; width:92%; max-width:520px; background:linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.008)); padding:14px; border-radius:18px; border:1px solid rgba(255,255,255,0.02); box-shadow:0 8px 30px rgba(0,0,0,0.6)">
+                  <div style="font-size:13px;color:var(--muted-2)">2025-04-07</div>
+                  <div style="font-weight:800;color:#7ed957;margin-top:6px">Progress Presentation I</div>
+                  <div style="margin-top:6px;color:white;">Progress Presentation I reviews the 50% completion status of
+                    the project. This reveals any gaps or inconsistencies in the design/requirments.</div>
+                </div>
+              </div>
+
+              <!-- item 3 (left) -->
+              <div style="display:grid; grid-template-columns:1fr 28px 1fr; gap:18px; align-items:center;">
+                <div
+                  style="justify-self:end; text-align:right; width:92%; max-width:520px; background:linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.008)); padding:14px; border-radius:18px; border:1px solid rgba(255,255,255,0.02); box-shadow:0 8px 30px rgba(0,0,0,0.6)">
+                  <div style="font-size:13px;color:var(--muted-2)">2025-04-15</div>
+                  <div style="font-weight:800;color:#7ed957;margin-top:6px">Reserach Paper</div>
+                  <div style="margin-top:6px;color:white">Describes what you contribute to existing knowledge, giving
+                    due recognition to all work that you referred in making new knowledge.</div>
+                </div>
+                <div style="text-align:center;">
+                  <div
+                    style="width:22px;height:22px;border-radius:50%; background:var(--bg); box-shadow:0 0 0 6px rgba(126,217,87,0.12); display:inline-flex; align-items:center; justify-content:center; color:var(--g1); font-weight:800">
+                    •</div>
+                </div>
+                <div></div>
+              </div>
+
+              <!-- item 4 (right) -->
+              <div style="display:grid; grid-template-columns:1fr 28px 1fr; gap:18px; align-items:center;">
+                <div></div>
+                <div style="text-align:center;">
+                  <div
+                    style="display:inline-block; width:36px; height:12px; border-radius:8px; background:linear-gradient(90deg,var(--g1),var(--g2)); box-shadow:0 8px 20px rgba(0,0,0,0.6), 0 0 0 4px rgba(126,217,87,0.06);">
+                  </div>
+                </div>
+                <div
+                  style="justify-self:start; width:92%; max-width:520px; background:linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.008)); padding:14px; border-radius:18px; border:1px solid rgba(255,255,255,0.02); box-shadow:0 8px 30px rgba(0,0,0,0.6)">
+                  <div style="font-size:13px;color:var(--muted-2)">2025-09-15</div>
+                  <div style="font-weight:800;color:#7ed957;margin-top:6px">Progress Presentation II</div>
+                  <div style="margin-top:6px;color:white;">Progress Presentation II reviews the 90% completion status
+                    demonstration of the project. Along with a Poster presentation which describes the project as a
+                    whole.</div>
+                </div>
+              </div>
+
+              <!-- item 5 (left) -->
+              <div style="display:grid; grid-template-columns:1fr 28px 1fr; gap:18px; align-items:center;">
+                <div
+                  style="justify-self:end; text-align:right; width:92%; max-width:520px; background:linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.008)); padding:14px; border-radius:18px; border:1px solid rgba(255,255,255,0.02); box-shadow:0 8px 30px rgba(0,0,0,0.6)">
+                  <div style="font-size:13px;color:var(--muted-2)">2025-08-29</div>
+                  <div style="font-weight:800;color:#7ed957;margin-top:6px">Final Report</div>
+                  <div style="margin-top:6px;color:white;">Status of the project is validated through the Logbook. This
+                    also includes, Status document 1 & 2.</div>
+                </div>
+                <div style="text-align:center;">
+                  <div
+                    style="width:22px;height:22px;border-radius:50%; background:var(--bg); box-shadow:0 0 0 6px rgba(126,217,87,0.12); display:inline-flex; align-items:center; justify-content:center; color:var(--g1); font-weight:800">
+                    •</div>
+                </div>
+                <div></div>
+              </div>
+
+              <!-- item 6 (right) -->
+              <div style="display:grid; grid-template-columns:1fr 28px 1fr; gap:18px; align-items:center;">
+                <div></div>
+                <div style="text-align:center;">
+                  <div
+                    style="display:inline-block; width:36px; height:12px; border-radius:8px; background:linear-gradient(90deg,var(--g1),var(--g2)); box-shadow:0 8px 20px rgba(0,0,0,0.6), 0 0 0 4px rgba(126,217,87,0.06);">
+                  </div>
+                </div>
+                <div
+                  style="justify-self:start; width:92%; max-width:520px; background:linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.008)); padding:14px; border-radius:18px; border:1px solid rgba(255,255,255,0.02); box-shadow:0 8px 30px rgba(0,0,0,0.6)">
+                  <div style="font-size:13px;color:var(--muted-2)">2025-10-27</div>
+                  <div style="font-weight:800;color:#7ed957;margin-top:6px">Final Presentation & Viva</div>
+                  <div style="margin-top:6px;color:white;">Viva is held individually to assess each member's
+                    contribution to the project.</div>
+                </div>
+              </div>
+
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- RESEARCH DOCUMENTS (keeps pattern look) -->
+      <section class="docs" aria-labelledby="docs">
+        <div class="section-inner">
+          <h2 id="docs">Research Documents & Presentations</h2>
+          <br>
+          <div style="display:grid; grid-template-columns:repeat(2,1fr); gap:10px; margin-top:12px;">
+            <div
+              style="padding:10px 12px; border-radius:8px; background:rgba(255,255,255,0.02); display:flex; justify-content:space-between; align-items:center;">
+              Project Charter <a
+                href="https://drive.google.com/file/d/12AuwQ3U5D9RXj62KCFXlbiMrMSJulG1N/view?usp=sharing"
+                style="color:var(--g1); text-decoration:none;">Download</a></div>
+            <div
+              style="padding:10px 12px; border-radius:8px; background:rgba(255,255,255,0.02); display:flex; justify-content:space-between; align-items:center;">
+              Project Proposal Presentation<a
+                href="https://docs.google.com/presentation/d/1oHkT8IJfklLExuPpFqPUzZrAY6rS0kg-/edit?usp=sharing&ouid=101438542164384948552&rtpof=true&sd=true"
+                style="color:var(--g1); text-decoration:none;">Download</a>
+            </div>
+            <div
+              style="padding:10px 12px; border-radius:8px; background:rgba(255,255,255,0.02); display:flex; justify-content:space-between; align-items:center;">
+              Project Proposal Document <a
+                href="https://drive.google.com/drive/folders/14FOKRGUAtX3nMgpvaTIWcO9pUTJCIXpG?usp=sharing"
+                style="color:var(--g1); text-decoration:none;">Download</a></div>
+            <div
+              style="padding:10px 12px; border-radius:8px; background:rgba(255,255,255,0.02); display:flex; justify-content:space-between; align-items:center;">
+              Progress Presenation I <a
+                href="https://docs.google.com/presentation/d/1TmeUj4vbtlD-M870nCYWzk4ix39uh6Sf/edit?usp=sharing&ouid=101438542164384948552&rtpof=true&sd=true"
+                style="color:var(--g1); text-decoration:none;">Download</a></div>
+            <div
+              style="padding:10px 12px; border-radius:8px; background:rgba(255,255,255,0.02); display:flex; justify-content:space-between; align-items:center;">
+              Reserach Paper <a href="#" style="color:var(--g1); text-decoration:none;">Download</a>
+            </div>
+            <div
+              style="padding:10px 12px; border-radius:8px; background:rgba(255,255,255,0.02); display:flex; justify-content:space-between; align-items:center;">
+              Progress Presentation II <a
+                href="https://docs.google.com/presentation/d/1jkWSM9qbCC-BJdl2IbIvbdnaHP3Tq1ux/edit?usp=sharing&ouid=101438542164384948552&rtpof=true&sd=true"
+                style="color:var(--g1); text-decoration:none;">Download</a>
+            </div>
+            <div
+              style="padding:10px 12px; border-radius:8px; background:rgba(255,255,255,0.02); display:flex; justify-content:space-between; align-items:center;">
+              Final Report <a
+                href="https://drive.google.com/drive/folders/1lcwO9u-MG0i7p0dTCZpjNkKtARCHVFd6?usp=sharing"
+                style="color:var(--g1); text-decoration:none;">Download</a>
+            </div>
+            <div
+              style="padding:10px 12px; border-radius:8px; background:rgba(255,255,255,0.02); display:flex; justify-content:space-between; align-items:center;">
+              Log Book <a href="#" style="color:var(--g1); text-decoration:none;">Download</a>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- TEAM -->
+      <section class="team" aria-labelledby="team">
+        <div class="section-inner">
+          <h2 id="team">Team</h2>
+          <div style="display:flex;flex-wrap:wrap;gap:12px;justify-content:center;margin-top:12px;">
+
+            <div
+              style="width:260px; display:flex; gap:12px; align-items:center; padding:12px; border-radius:10px; background:rgba(255,255,255,0.02); border:1px solid rgba(255,255,255,0.01)">
+              <img src="assets/profiles/supervisor.jpg" alt="Dr. Lakmini Abeywardhana"
+                style="width:56px;height:56px;border-radius:10px;border:2px solid var(--g1);object-fit:cover;">
+              <div style="text-align:left"><strong>Dr. Lakmini Abeywardhana</strong>
+                <div style="font-size:13px;color:var(--muted-2)">Supervisor</div>
+              </div>
+            </div>
+
+            <div
+              style="width:260px; display:flex; gap:12px; align-items:center; padding:12px; border-radius:10px; background:rgba(255,255,255,0.02); border:1px solid rgba(255,255,255,0.01)">
+              <img src="assets/profiles/co-supervisor.jpg" alt="Asha Mirza"
+                style="width:56px;height:56px;border-radius:10px;border:2px solid var(--g2);object-fit:cover;">
+              <div style="text-align:left"><strong>Ms. Thamali Dassanayake</strong>
+                <div style="font-size:13px;color:var(--muted-2)">Co-Supervisor</div>
+              </div>
+            </div>
+
+            <div
+              style="width:260px; display:flex; gap:12px; align-items:center; padding:12px; border-radius:10px; background:rgba(255,255,255,0.02); border:1px solid rgba(255,255,255,0.01)">
+              <img src="assets/profiles/member1.png" alt="Dilan Kumara"
+                style="width:56px;height:56px;border-radius:10px;border:2px solid var(--g1);object-fit:cover;">
+              <div style="text-align:left"><strong>Shehan Fernando</strong>
+                <div style="font-size:13px;color:var(--muted-2)">Group Leader</div>
+              </div>
+            </div>
+
+            <div
+              style="width:260px; display:flex; gap:12px; align-items:center; padding:12px; border-radius:10px; background:rgba(255,255,255,0.02); border:1px solid rgba(255,255,255,0.01)">
+              <img src="assets/profiles/member2.jpg" alt="Zahem Saldin"
+                style="width:56px;height:56px;border-radius:10px;border:2px solid var(--g2);object-fit:cover;">
+              <div style="text-align:left"><strong>Zahem Saldin</strong>
+                <div style="font-size:13px;color:var(--muted-2)">Member</div>
+              </div>
+            </div>
+
+            <div
+              style="width:260px; display:flex; gap:12px; align-items:center; padding:12px; border-radius:10px; background:rgba(255,255,255,0.02); border:1px solid rgba(255,255,255,0.01)">
+              <img src="assets/profiles/member3.jpg" alt="Wasana Perera"
+                style="width:56px;height:56px;border-radius:10px;border:2px solid var(--g1);object-fit:cover;">
+              <div style="text-align:left"><strong>Wasana Perera</strong>
+                <div style="font-size:13px;color:var(--muted-2)">Member</div>
+              </div>
+            </div>
+
+            <div
+              style="width:260px; display:flex; gap:12px; align-items:center; padding:12px; border-radius:10px; background:rgba(255,255,255,0.02); border:1px solid rgba(255,255,255,0.01)">
+              <img src="assets/profiles/member4.jpg" alt="Heshan Premarathna"
+                style="width:56px;height:56px;border-radius:10px;border:2px solid var(--g2);object-fit:cover;">
+              <div style="text-align:left"><strong>Heshan Premarathna</strong>
+                <div style="font-size:13px;color:var(--muted-2)">Member</div>
+              </div>
+            </div>
+
+          </div>
+        </div>
+      </section>
+
+
+      <!-- CONTACT -->
+      <section class="contact" aria-labelledby="contact">
+        <div class="section-inner">
+          <h2 id="contact">Connect with Us</h2>
+
+          <!-- Scoped styles for contact section only -->
+          <style>
+            .contact .contact-panel {
+              margin: 18px auto 0;
+              max-width: 760px;
+              background:
+                radial-gradient(1200px 200px at 10% 10%, rgba(126, 217, 87, 0.03), transparent 8%),
+                linear-gradient(180deg, rgba(255, 255, 255, 0.02), rgba(255, 255, 255, 0.008));
+              border-radius: 16px;
+              padding: 22px;
+              border: 1px solid rgba(126, 217, 87, 0.06);
+              display: flex;
+              gap: 20px;
+              align-items: flex-start;
+              box-shadow: 0 12px 40px rgba(0, 0, 0, 0.45);
+            }
+
+            p {
+              text-align: justify;
+            }
+
+            /* Left decorative column */
+            .contact .contact-deco {
+              width: 120px;
+              min-height: 160px;
+              border-radius: 10px;
+              background: linear-gradient(135deg, rgba(126, 217, 87, 0.08), rgba(122, 203, 83, 0.06));
+              display: flex;
+              align-items: center;
+              justify-content: center;
+              flex-direction: column;
+              padding: 12px;
+              color: rgba(0, 0, 0, 0.8);
+              font-weight: 700;
+              letter-spacing: 0.6px;
+            }
+
+            .contact .contact-deco .leaf {
+              font-size: 32px;
+              margin-bottom: 8px;
+            }
+
+            .contact .contact-deco small {
+              font-size: 12px;
+              color: rgba(0, 0, 0, 0.6)
+            }
+
+            /* Form area */
+            .contact .contact-form {
+              flex: 1;
+              display: flex;
+              flex-direction: column;
+              gap: 12px;
+            }
+
+            .contact .contact-form input[type="text"],
+            .contact .contact-form input[type="email"],
+            .contact .contact-form textarea {
+              width: 100%;
+              padding: 12px 14px;
+              border-radius: 10px;
+              border: 1px solid #7acb53;
+              background: rgba(0, 0, 0, 0.45);
+              color: var(--muted);
+              font-size: 15px;
+              outline: none;
+              transition: box-shadow .18s ease, transform .12s ease;
+              resize: vertical;
+            }
+
+            .contact .contact-form input::placeholder,
+            .contact .contact-form textarea::placeholder {
+              color: rgba(255, 255, 255, 0.45);
+            }
+
+            .contact .contact-form input:focus,
+            .contact .contact-form textarea:focus {
+              box-shadow: 0 0 0 4px rgba(126, 217, 87, 0.06);
+              transform: translateY(-2px);
+            }
+
+            .contact .contact-row {
+              display: grid;
+              grid-template-columns: 1fr 1fr;
+              gap: 10px;
+            }
+
+            @media (max-width:760px) {
+              .contact .contact-panel {
+                flex-direction: column;
+                align-items: stretch;
+              }
+
+              .contact .contact-deco {
+                width: 100%;
+                min-height: 80px;
+                flex-direction: row;
+                gap: 12px;
+                padding: 10px 14px;
+              }
+
+              .contact .contact-row {
+                grid-template-columns: 1fr;
+              }
+            }
+
+            /* Submit button */
+            .contact .btn {
+              align-self: flex-end;
+              background: linear-gradient(90deg, var(--g1), var(--g2));
+              color: #001;
+              font-weight: 800;
+              padding: 10px 18px;
+              border-radius: 12px;
+              border: none;
+              cursor: pointer;
+              box-shadow: 0 8px 30px rgba(126, 217, 87, 0.06);
+              transition: transform .12s ease, box-shadow .12s ease;
+              font-size: 15px;
+            }
+
+            .contact .btn:hover {
+              transform: translateY(-4px);
+              box-shadow: 0 18px 40px rgba(126, 217, 87, 0.12);
+            }
+
+            .contact .btn:active {
+              transform: translateY(-1px);
+            }
+
+            /* small helper text */
+            .contact .helper {
+              font-size: 13px;
+              color: var(--muted-2);
+              margin-top: 6px;
+            }
+          </style>
+
+          <div class="contact-panel" role="region" aria-label="Contact panel">
+            <div class="contact-deco" aria-hidden="true">
+              <div class="leaf"><img src="assets/leaf.png" style="height: 75px; width: 75px;"></div>
+            </div>
+
+            <div
+              style="width:220px; border-radius:12px; padding:12px; background: linear-gradient(135deg, rgba(126, 217, 87, 0.06), rgba(122, 203, 83, 0.03)); border:1px solid rgba(126,217,87,0.04); color:var(--muted-2); font-size:14px; display:flex; flex-direction:column; gap:8px;">
+              <div style="font-weight:800; color:var(--g2);">Contact</div>
+              <div style="font-size:13px;">Email:
+                <a href="mailto:agriMatrix@gmail.com"
+                  style="color:var(--g1); text-decoration:none; font-weight:700;">agrimatrix@gmail.com</a>
+              </div>
+              <div style="font-size:13px;">Address: Sri Lanka Institute of Information Technology (SLIIT), Malabe, Sri
+                Lanka</div>
+            </div>
+
+            <form class="contact-form"
+              onsubmit="event.preventDefault(); location.href = 'mailto:agriMatrix@example.com?subject=' + encodeURIComponent('AgriMatrix contact from ' + document.getElementById('name').value) + '&body=' + encodeURIComponent(document.getElementById('msg').value)">
+              <div class="contact-row">
+                <input id="name" type="text" placeholder="Your name" required />
+                <input id="email" type="email" placeholder="Your email" required />
+              </div>
+
+              <textarea id="msg" rows="5" placeholder="Your message" required></textarea>
+
+              <div style="display:flex; gap:12px; align-items:center; justify-content:space-between;">
+                <div class="helper">Prefer a reply? We'll respond within 48 hours.</div>
+                <button class="btn" type="submit">Send</button>
+              </div>
+            </form>
+          </div>
+
+        </div>
+      </section>
+
+    </main>
+
+    <footer style="margin-top:18px; text-align:center; color:rgba(255,255,255,0.75);">
+      AgriMatrix © 2025 | Developed by the AgriMatrix Research Team |
+      Sri Lanka Institute of Information Technology (SLIIT)
+
+
+    </footer>
+  </div>
+
+  <script>
+    (function () {
+      const cubesArea = document.getElementById('cubesArea');
+      if (!cubesArea) return;
+
+      // spawn settings
+      const SPAWN_INTERVAL = 120; // ms between spawn bursts
+      const BURST_SIZE = 5;       // cubes per burst
+
+      // decreased falling height
+      const MIN_FALL = 90;  // pixels
+      const MAX_FALL = 100; // pixels
+
+      function rand(min, max) {
+        return min + Math.random() * (max - min);
+      }
+
+      function spawnCube() {
+        const areaWidth = Math.max(1, cubesArea.clientWidth);
+
+        for (let i = 0; i < BURST_SIZE; i++) {
+          const c = document.createElement('div');
+          c.className = 'cube';
+
+          // cube base size
+          const size = Math.round(rand(6, 12));
+          Object.assign(c.style, {
+            width: size + 'px',
+            height: size + 'px',
+            position: 'absolute',
+            top: rand(8, 18) + 'px',
+            left: Math.round(rand(areaWidth * 0.1, areaWidth * 0.7)) + 'px', // narrowed horizontal spawn zone
+            opacity: '1',
+            transform: 'translateY(0px) rotate(0deg)',
+            pointerEvents: 'none',
+            willChange: 'transform, opacity'
+          });
+
+          const rotation = rand(-5, 5);
+          c.style.transform = `translateY(0px) rotate(${rotation}deg)`;
+
+          cubesArea.appendChild(c);
+
+          // animation setup
+          const duration = rand(2200, 3400); // ms
+          const delay = rand(0, 600); // ms
+          const driftX = rand(-10, 10); // very small horizontal drift
+          const finalY = rand(MIN_FALL, MAX_FALL);
+          const endRotate = rotation + rand(5, 15);
+
+          const frames = [
+            { transform: `translateY(0px) translateX(0px) rotate(${rotation}deg)`, opacity: 1 },
+            { transform: `translateY(${finalY * 0.5}px) translateX(${driftX * 0.5}px) rotate(${rotation + (endRotate - rotation) * 0.4}deg)`, opacity: 1 },
+            { transform: `translateY(${finalY}px) translateX(${driftX}px) rotate(${endRotate}deg)`, opacity: 0 }
+          ];
+
+          const anim = c.animate(frames, {
+            duration: duration,
+            easing: 'cubic-bezier(.22,.9,.35,1)',
+            delay: delay,
+            fill: 'forwards'
+          });
+
+          anim.finished.then(() => {
+            try { c.remove(); } catch (e) { }
+          });
+        }
+      }
+
+      const iv = setInterval(spawnCube, SPAWN_INTERVAL);
+      window.addEventListener('beforeunload', () => clearInterval(iv));
+
+    })();
+  </script>
+
+
+</body>
+
+</html>
